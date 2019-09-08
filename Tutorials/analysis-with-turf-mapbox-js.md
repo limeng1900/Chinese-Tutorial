@@ -32,33 +32,32 @@ contentType: tutorial
   />
 }}
 
-This guide walks you through how to use [Turf.js](http://turfjs.org), a JavaScript library for spatial analysis and statistics.
+本教程将带你了解如何使用 [Turf.js](http://turfjs.org)，它是一个用来空间分析和统计的 JavaScript 库。
 
-Let's say you are part of a team that manages health and safety for the libraries in Lexington, KY. One important part of your preparedness mandate is to know __which hospital is closest to each library__ in case there's an emergency at one of your facilities. This example will walk you through making a map of libraries and hospitals; when a user clicks on a library, the map will show which hospital is nearest.
+假设你是肯塔基州列克星敦市图书馆健康与安全管理团队的一员，为了应对万一的紧急情况，你工作任务中的一个重要部分是了解 __对于每个图书馆来说哪个医院最近__ 。下面这个示例将向你展示图书馆和医院的地图，当点击其中一个图书馆时，地图会展示出离它最近的医院。
 
 {{
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-five.html" />
 }}
 
-## Getting started
+## 起步
 
-There are a few resources you'll need to get started:
+开始之前，这里有一些你需要的资源：
 
-- [__A tileset ID__](/help/glossary/tileset-id). An ID points to a unique map you have created on Mapbox.
-- [__An access token__](/help/glossary/access-token/). The token is used to associate a map with your account:
+- [__一个 tileset ID__](/help/glossary/tileset-id) 一个指向你在 Mapbox 上创建的唯一地图的 ID。
+- [__一个 access token__](/help/glossary/access-token/) 用来将地图关联到你的账户。
 
 ```js
 L.mapbox.accessToken = '{{ <UserAccessToken /> }}';
 ```
 
-- [__Mapbox.js__](https://www.mapbox.com/mapbox.js/). The Mapbox JavaScript API for building maps.
-- [__Turf.js__](http://turfjs.org/). Turf is the JavaScript library you'll be using today to add analysis to your map.
-- __Data.__ This example uses two data files: hospitals in Lexington, KY and libraries in Lexington, KY.
-- __A text editor.__ You'll be writing HTML, CSS, and JavaScript.
+- [__Turf.js__](http://turfjs.org/) 它是你今天用来给地图添加分析功能的 JavaScript 库。
+- __数据__  这个示例用到了两个数据文件：列克星敦的医院数据（hospitals in Lexington）和 列克星敦的图书馆数据（KY and libraries in Lexington, KY）。
+- __一个文本编辑器__  你需要用它来编写HTML、CSS 和 JavaScript。
 
-## Add structure
+## 添加主体框架
 
-For this guide, you will include the latest versions of Mapbox.js and Turf.js. Create a new HTML file in your text editor, and add these libraries to the head by copying the snippet below:
+本教程中要引入最新版本的 Mapbox.js 和 Turf.js。在文本编辑器中创建一个新的 HTML 文件，复制以下代码，将这些库添加到你的 head 中：
 
 ```html
 <link href='https://api.mapbox.com/mapbox.js/{{constants.VERSION_MAPBOXJS}}/mapbox.css' rel='stylesheet' />
@@ -66,13 +65,13 @@ For this guide, you will include the latest versions of Mapbox.js and Turf.js. C
 <script src='https://api.mapbox.com/mapbox.js/plugins/turf/{{constants.VERSION_TURF}}/turf.min.js'></script>
 ```
 
-Now, add your map element. First, in the `body`, create an empty `div` for your map:
+现在，添加你的地图元素，首先在 `body` 中为你的地图创建一个空 `div`：
 
 ```html
 <div id='map'></div>
 ```
 
-Next, add some CSS to a `style` element in the `head` so your map takes up the width of the page:
+接下来，向 `head` 中的 `style` 元素添加一些 CSS，让地图的宽度充满页面。
 
 ```css
 body {
@@ -88,11 +87,11 @@ body {
 }
 ```
 
-## Initialize a map
+## 地图初始化
 
-Now that your page has some nice structure to it, go ahead and get a map on the page using Mapbox.js.
+现在你的页面已经有了合适的框架，下一步使用 Mapbox.js 来加载一副地图。
 
-You'll create a `L.mapbox.map` object called `map` and use `setView` to center the map on Lexington, KY. This is where you'll need to use your access token and tileset ID. Add the following script inside the `<body>` after the HTML:
+你将创建一个名称为 `map` 的 `L.mapbox.map` 对象，并使用 `setView` 将地图中心定位于列克星敦市。这里就是你要用到access token 和 tileset ID 的地方。请在 `<body>` 中上述 HTML 后面的添加以下代码：
 
 ```js
 L.mapbox.accessToken = '{{ <UserAccessToken /> }}';
@@ -106,34 +105,34 @@ map.scrollWheelZoom.disable();
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-one.html" />
 }}
 
-Sweet! Now your page has a map centered on Lexington, KY.
+很好，现在你的页面有了一个以列克星敦为中心的地图。
 
 {{
   <Note imageComponent={<BookImage />}>
-    <p>There is an additional line in the code above that turns off scroll zoom on the map. This is optional.</p>
+    <p>上面代码中额外有一行代码关闭了地图滚轮缩放功能，这个是可选的。</p>
   </Note>
 }}
 
 
-## Load data
+## 加载数据
 
-As mentioned above, this example uses two data files: libraries and hospitals in Lexington, KY, each of them is a GeoJSON FeatureCollection. In the next step, you'll add them to the map as `L.mapbox.featureLayer` objects and add a little code to make sure they're styled differently from each other. Also, you'll make sure that your map view contains all the points by fitting the map bounds to your features:
+之前提到，这个示例使用了两个数据文件：列克星敦的医院数据（hospitals in Lexington）和 列克星敦的图书馆数据（KY and libraries in Lexington, KY），它们的形式都是 GeoJSON FeatureCollection。下一步，将它们作为 `L.mapbox.featureLayer` 对象加入地图，并且添加一些代码来让它们拥有不同的样式。另外，还要通过地图边界对要素的适应调整，从而确保所有的点都包含在地图的视图范围内。
 
 ```js
 L.mapbox.accessToken = '{{ <UserAccessToken /> }}';
 
-// store GeoJSON objects in these variables
+// 将GeoJSON对象存入变量
 var hospitals = {{ hospitalsLex }};
 var libraries = {{ librariesLex }};
 
-// Add marker color, symbol, and size to hospital GeoJSON
+// 给医院 GeoJSON 添加标记的颜色、符号和尺寸设置
 for (var i = 0; i < hospitals.features.length; i++) {
   hospitals.features[i].properties['marker-color'] = '#DC143C';
   hospitals.features[i].properties['marker-symbol'] = 'hospital';
   hospitals.features[i].properties['marker-size'] = 'small';
 }
 
-// Add marker color, symbol, and size to library GeoJSON
+// 给图书馆 GeoJSON 添加标记的颜色、符号和尺寸设置
 for (var j = 0; j < libraries.features.length; j++) {
   libraries.features[j].properties['marker-color'] = '#4169E1';
   libraries.features[j].properties['marker-symbol'] = 'library';
@@ -150,24 +149,24 @@ var hospitalLayer = L.mapbox.featureLayer(hospitals)
 var libraryLayer = L.mapbox.featureLayer(libraries)
   .addTo(map);
 
-// When map loads, zoom to libraryLayer features
+// 在地图加载时将地图缩放到 libraryLayer 的要素
 map.fitBounds(libraryLayer.getBounds());
 ```
 
-Note that `hospitalLayer` and `libraryLayer` are defined _after_ you create your `map` object; you must define them in this order to make sure they can be added to the map.
+请注意 `hospitalLayer` 和 `libraryLayer` 的定义是在你创建 `map` 对象 _之后_ 。你必须按照这个顺序才能确保它们可以加载到地图上。
 
 {{
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-two.html" />
 }}
 
-Alternatively, you can save the GeoJSON as one or two `.geojson` files and [load the files on to the map](https://www.mapbox.com/mapbox.js/example/v1.0.0/geojson-marker-from-url/). If you do this, you will need to run this application from a local web server otherwise, you will receive a [Cross-origin Resource Sharing](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing) (CORS) error.
+另外，可以将 GEOJSON 保存为 `.geojson` 文件并且[将这些文件加载到地图](https://www.mapbox.com/mapbox.js/example/v1.0.0/geojson-marker-from-url/)。如果要这么做，就需要通过本地 web 服务来运行这个应用，否则会出现[跨域资源共享](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing) (CORS) 错误。
 
-## Add interactivity
+## 添加交互
 
-Your map users will want to know the names of the libraries and hospitals displayed on the map, so next you'll add some popups. For this map, add some popups to these features that appear when the user hovers over the markers. Insert this into your script after you've created `hospitalLayer` and `libraryLayer`:
+你的用户可能会想要知道地图上显示的图书馆和医院的名称，所以下面我们来添加弹窗。当用户悬停在标记上时，给要素添加弹窗。在你创建的 `hospitalLayer` 和 `libraryLayer` 后面插入以下内容：
 
 ```js
-// Bind a popup to each feature in hospitalLayer and libraryLayer
+//  给 hospitalLayer 和 libraryLayer 的每个要素绑定一个弹窗
 hospitalLayer.eachLayer(function(layer) {
   layer.bindPopup('<strong>' + layer.feature.properties.Name + '</strong>', { closeButton: false });
 }).addTo(map);
@@ -175,7 +174,7 @@ libraryLayer.eachLayer(function(layer) {
   layer.bindPopup(layer.feature.properties.Name, { closeButton: false });
 }).addTo(map);
 
-// Open popups on hover
+// 悬停时打开弹窗
 libraryLayer.on('mouseover', function(e) {
   e.layer.openPopup();
 });
@@ -188,35 +187,35 @@ hospitalLayer.on('mouseover', function(e) {
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-three.html" />
 }}
 
-Next, you'll make your map of the libraries and hospitals in Lexington even more useful by adding some analysis.
+接下来，你将通过添加一些分析功能，来让列克星敦的图书馆和医院地图更加有用。
 
-## Use Turf
+## 使用 Turf
 
-[Turf](http://turfjs.org) is a JavaScript library for adding spatial and statistical analysis to your web maps. It contains many commonly-used GIS tools (like buffer, union, and merge) as well as statistical analysis functions (like sum, median, and average).
+[Turf](http://turfjs.org) 是一个给 web 地图增加空间和统计分析功能的 JavaScript 库。它除了包含了许多常用的 GIS 工具（如缓冲区、叠加和合并），还拥有许多统计分析函数（如加和、求中位数和均值）。
 
-Fortunately, Turf has some functions that will help you out here! You're going to update your map so that clicking on a library will show users which hospital is closest to that library.
+幸运的是，Turf 有一些函数可以在这里帮到你！你可以升级你的地图，从而在用户点击图书馆时向他展示哪个医院离的最近。
 
-As a first step, make an "event handler" for when someone clicks on a library marker. When an event occurs, like a click on a marker, the event handler tells the map what to do in response. Before, you created event handlers for hovering over hospital and library markers; now you're going to make one for clicks.
+作为第一步，在有人点击图书馆标记时创建一个“事件处理程序”。当事件发生时，例如点击了一个标记，事件处理程序将告诉地图如何响应。之前，我们已经创建了一个医院和图书馆标记悬停的事件处理程序，现在需要继续为点击添加一个事件处理程序。
 
 ```js
 libraryLayer.on('click', function(e) {});
 ```
 
-This is the structure of an event handler; anything you want to happen on click goes inside of the braces `{}`. In this case, you want to use Turf to identify the nearest hospital to the clicked library and make that marker larger to identify it.
+这是一个事件处理程序的构造，你要将任何想要在点击后发生的内容放进大括号 `{}` 中。在这个例子中，你需要使用 Turf 来识别出距离被点击图书馆最近的医院，并且将它的标记放大。
 
 ```js
 libraryLayer.on('click', function(e) {
-  // Get the GeoJSON from libraryFeatures and hospitalFeatures
+  // 从 libraryFeatures 和 hospitalFeatures 获得 GeoJSON
   var libraryFeatures = libraryLayer.getGeoJSON();
   var hospitalFeatures = hospitalLayer.getGeoJSON();
 
-  // Using Turf, find the nearest hospital to library clicked
+  // 使用 Turf 找到离被点击图书馆最近的医院
   var nearestHospital = turf.nearest(e.layer.feature, hospitalFeatures);
 
-  // Change the nearest hospital to a large marker
+  // 将这个最近医院的标记尺寸修改为大号
   nearestHospital.properties['marker-size'] = 'large';
 
-  // Add the new GeoJSON to hospitalLayer
+  // 将新的 GeoJSON 添加到 hospitalLayer
   hospitalLayer.setGeoJSON(hospitalFeatures);
 });
 ```
@@ -225,17 +224,18 @@ libraryLayer.on('click', function(e) {
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-four.html" />
 }}
 
-Excellent! This is almost ready to go.
+很棒！ 差不多快要完成了。
 
-## Add finishing touches
+## 收尾工作
 
 <!--copyeditor ignore previously-->
-When a user clicks on a library, the nearest hospital gets larger. But when the user click on a different library, or on the map, the previously-nearest hospital doesn't go back to a small marker again. To address this, add some code to make the popup for the nearest hospital open up when it gets larger.
 
-Add the following function before the click event handler.
+当用户点击图书管事，最近的医院就会变大。但是当用户点击另一个图书馆或地图时，前面这个最近的医院不会恢复成小标记。解决这个问题的同时，我们再加一些代码让最近医院在标记变大时打开弹窗。
+
+在点击事件处理程序之前加入下面的函数。
 
 ```js
-// reset marker size to small
+// 将标记尺寸重置为小号
 function reset() {
   var hospitalFeatures = hospitalLayer.getGeoJSON();
   for (var i = 0; i < hospitalFeatures.features.length; i++) {
@@ -245,28 +245,27 @@ function reset() {
 }
 ```
 
-Then, inside of the click handler, add a function call to `reset()` and some code for making sure the nearest hospital opens a popup when it gets larger.
+然后在点击处理中添加一个函数调用 `reset()`，再加一些代码来让最近医院的标记在变大时打开弹窗。
 
 ```js
 libraryLayer.on('click', function(e) {
-  // Reset any and all marker sizes to small
+  // 将所有标记尺寸重置为小号
   reset();
 
-  // Get the GeoJSON from libraryFeatures and hospitalFeatures
+  // 从 libraryFeatures 和 hospitalFeatures 获得 GeoJSON
   var libraryFeatures = libraryLayer.getGeoJSON();
   var hospitalFeatures = hospitalLayer.getGeoJSON();
 
-  // Using Turf, find the nearest hospital to library clicked
+  // 使用 Turf 找到离被点击图书馆最近的医院
   var nearestHospital = turf.nearest(e.layer.feature, hospitalFeatures);
 
-  // Change the nearest hospital to a large marker
+  // 将这个最近医院的标记尺寸修改为大号
   nearestHospital.properties['marker-size'] = 'large';
 
-  // Add the new GeoJSON to hospitalLayer
+  // 将新的 GeoJSON 添加到 hospitalLayer
   hospitalLayer.setGeoJSON(hospitalFeatures);
 
-  // Bind popups to new hospitalLayer and open popup
-  // for nearest hospital
+  // 给新的 hospitalLayer 绑定弹窗，并将最近医院的弹窗打开
   hospitalLayer.eachLayer(function(layer) {
     layer.bindPopup('<strong>' + layer.feature.properties.Name + '</strong>', { closeButton: false });
     if (layer.feature.properties['marker-size'] === 'large') {
@@ -276,7 +275,7 @@ libraryLayer.on('click', function(e) {
 });
 ```
 
-Lastly, add a little bit of code at the end to reset all the markers to small when anywhere on the map is clicked (besides on a library).
+最后，在末尾添加一点代码，使得在点击地图上任意位置（除了图书馆）时，将所有的标记尺寸重置为小号。
 
 ```js
 map.on('click', function(e) {
@@ -288,9 +287,9 @@ map.on('click', function(e) {
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-five.html" />
 }}
 
-## Finished product
+## 完成
 
-Nicely done! You have successfully created a map that calculates which hospital is closest to each library dynamically. Your finished HTML file should look like this:
+干得漂亮！你已经成功创建了一个地图，它可以动态地计算对于每个图书馆哪个医院离得最近。你完成的 HTML 文件应该是这样的：
 
 ```html
 <html>
@@ -323,14 +322,14 @@ Nicely done! You have successfully created a map that calculates which hospital 
     var hospitals = {{ hospitalsLex }};
     var libraries = {{ librariesLex }};
 
-    // Add marker color, symbol, and size to hospital GeoJSON
+    // 给医院 GeoJSON 添加标记的颜色、符号和尺寸设置
     for (var i = 0; i < hospitals.features.length; i++) {
       hospitals.features[i].properties['marker-color'] = '#DC143C';
       hospitals.features[i].properties['marker-symbol'] = 'hospital';
       hospitals.features[i].properties['marker-size'] = 'small';
     }
 
-    // Add marker color, symbol, and size to library GeoJSON
+    // 给图书馆 GeoJSON 添加标记的颜色、符号和尺寸设置
     for (var j = 0; j < libraries.features.length; j++) {
       libraries.features[j].properties['marker-color'] = '#4169E1';
       libraries.features[j].properties['marker-symbol'] = 'library';
@@ -349,7 +348,7 @@ Nicely done! You have successfully created a map that calculates which hospital 
 
     map.fitBounds(libraryLayer.getBounds());
 
-    // Bind a popup to each feature in hospitalLayer and libraryLayer
+    // 给 hospitalLayer 和 libraryLayer 的每个要素绑定一个弹窗
     hospitalLayer.eachLayer(function(layer) {
       layer.bindPopup('<strong>' + layer.feature.properties.Name + '</strong>', { closeButton: false });
     }).addTo(map);
@@ -357,7 +356,7 @@ Nicely done! You have successfully created a map that calculates which hospital 
       layer.bindPopup(layer.feature.properties.Name, { closeButton: false });
     }).addTo(map);
 
-    // Open popups on hover
+    // 悬停时打开弹窗
     libraryLayer.on('mouseover', function(e) {
       e.layer.openPopup();
     });
@@ -365,7 +364,7 @@ Nicely done! You have successfully created a map that calculates which hospital 
       e.layer.openPopup();
     });
 
-    // Reset marker size to small
+    // 将标记尺寸重置为小号
     function reset() {
       var hospitalFeatures = hospitalLayer.getGeoJSON();
       for (var k = 0; k < hospitalFeatures.features.length; k++) {
@@ -374,21 +373,20 @@ Nicely done! You have successfully created a map that calculates which hospital 
       hospitalLayer.setGeoJSON(hospitalFeatures);
     }
 
-    // When a library is clicked, do the following
+    // 当图书馆被点击时，操作如下
     libraryLayer.on('click', function(e) {
-      // Reset any and all marker sizes to small
+      // 将所有标记尺寸重置为小号
       reset();
-      // Get the GeoJSON from libraryFeatures and hospitalFeatures
+      // 从 libraryFeatures 和 hospitalFeatures 获得 GeoJSON
       var libraryFeatures = libraryLayer.getGeoJSON();
       var hospitalFeatures = hospitalLayer.getGeoJSON();
-      // Using Turf, find the nearest hospital to library clicked
+      // 使用 Turf 找到离被点击图书馆最近的医院
       var nearestHospital = turf.nearest(e.layer.feature, hospitalFeatures);
-      // Change the nearest hospital to a large marker
+      // 将这个最近医院的标记尺寸修改为大号
       nearestHospital.properties['marker-size'] = 'large';
-      // Add the new GeoJSON to hospitalLayer
+      // 将新的 GeoJSON 添加到 hospitalLayer
       hospitalLayer.setGeoJSON(hospitalFeatures);
-      // Bind popups to new hospitalLayer and open popup
-      // for nearest hospital
+      // 给新的 hospitalLayer 绑定弹窗，并将最近医院的弹窗打开
       hospitalLayer.eachLayer(function(layer) {
         layer.bindPopup('<strong>' + layer.feature.properties.Name + '</strong>', { closeButton: false });
         if (layer.feature.properties['marker-size'] === 'large') {
@@ -397,8 +395,7 @@ Nicely done! You have successfully created a map that calculates which hospital 
       });
     });
 
-    // When the map is clicked on anywhere, reset all
-    // hospital markers to small
+    // 点击地图上任意位置时，将所有的标记尺寸重置为小号
     map.on('click', function(e) {
       reset();
     });
@@ -408,6 +405,6 @@ Nicely done! You have successfully created a map that calculates which hospital 
 </html>
 ```
 
-## Next steps
+## 下一步
 
-[Turf](http://turfjs.org) has dozens of tools that would help extend this map even further. For example, you could also use [turf.distance](http://turfjs.org/docs/#distance) to determine not only which hospital is closest, but exactly how far away it is. The possibilities are virtually endless with Turf.js!
+[Turf](http://turfjs.org) 拥有几十种工具可以帮你进一步扩展这个地图。比如，你可以使用[turf.distance](http://turfjs.org/docs/#distance) ，不只判断哪个医院最近，还能明确它到底有多远。Turf.js 可以为你带来无限可能！
