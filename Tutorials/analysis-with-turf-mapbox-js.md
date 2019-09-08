@@ -51,6 +51,7 @@ contentType: tutorial
 L.mapbox.accessToken = '{{ <UserAccessToken /> }}';
 ```
 
+- [__Mapbox.js__](https://www.mapbox.com/mapbox.js/) 它是用于创建地图的 Mapbox JavaScript API。
 - [__Turf.js__](http://turfjs.org/) 它是你今天用来给地图添加分析功能的 JavaScript 库。
 - __数据__  这个示例用到了两个数据文件：列克星敦的医院数据（hospitals in Lexington）和 列克星敦的图书馆数据（KY and libraries in Lexington, KY）。
 - __一个文本编辑器__  你需要用它来编写HTML、CSS 和 JavaScript。
@@ -91,7 +92,7 @@ body {
 
 现在你的页面已经有了合适的框架，下一步使用 Mapbox.js 来加载一副地图。
 
-你将创建一个名称为 `map` 的 `L.mapbox.map` 对象，并使用 `setView` 将地图中心定位于列克星敦市。这里就是你要用到access token 和 tileset ID 的地方。请在 `<body>` 中上述 HTML 后面的添加以下代码：
+你将创建一个名称为 `map` 的 `L.mapbox.map` 对象，并使用 `setView` 将地图中心定位于列克星敦市。这里就是你要用到access token 和 tileset ID 的地方。请在 `<body>` 中上述 HTML 的后面添加以下代码：
 
 ```js
 L.mapbox.accessToken = '{{ <UserAccessToken /> }}';
@@ -116,7 +117,7 @@ map.scrollWheelZoom.disable();
 
 ## 加载数据
 
-之前提到，这个示例使用了两个数据文件：列克星敦的医院数据（hospitals in Lexington）和 列克星敦的图书馆数据（KY and libraries in Lexington, KY），它们的形式都是 GeoJSON FeatureCollection。下一步，将它们作为 `L.mapbox.featureLayer` 对象加入地图，并且添加一些代码来让它们拥有不同的样式。另外，还要通过地图边界对要素的适应调整，从而确保所有的点都包含在地图的视图范围内。
+之前提到，这个示例使用了两个数据文件：列克星敦的医院数据（hospitals in Lexington）和 列克星敦的图书馆数据（libraries in Lexington, KY），它们的形式都是 GeoJSON FeatureCollection。下一步，将它们作为 `L.mapbox.featureLayer` 对象加入地图，并且添加一些代码来让它们拥有不同的样式。另外，还要通过地图边界对要素的适应调整，从而确保所有的点都包含在地图的视图范围内。
 
 ```js
 L.mapbox.accessToken = '{{ <UserAccessToken /> }}';
@@ -149,17 +150,17 @@ var hospitalLayer = L.mapbox.featureLayer(hospitals)
 var libraryLayer = L.mapbox.featureLayer(libraries)
   .addTo(map);
 
-// 在地图加载时将地图缩放到 libraryLayer 的要素
+// 在地图加载时将地图缩放到 libraryLayer 要素
 map.fitBounds(libraryLayer.getBounds());
 ```
 
-请注意 `hospitalLayer` 和 `libraryLayer` 的定义是在你创建 `map` 对象 _之后_ 。你必须按照这个顺序才能确保它们可以加载到地图上。
+请注意在你创建 `map` 对象 _之后_ 才能定义`hospitalLayer` 和 `libraryLayer`。你必须按照这个顺序才能确保它们可以加载到地图上。
 
 {{
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-two.html" />
 }}
 
-另外，可以将 GEOJSON 保存为 `.geojson` 文件并且[将这些文件加载到地图](https://www.mapbox.com/mapbox.js/example/v1.0.0/geojson-marker-from-url/)。如果要这么做，就需要通过本地 web 服务来运行这个应用，否则会出现[跨域资源共享](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing) (CORS) 错误。
+另外，可以将 GeoJSON 保存为 `.geojson` 文件并且[将这些文件加载到地图](https://www.mapbox.com/mapbox.js/example/v1.0.0/geojson-marker-from-url/)。如果要这么做，就需要通过本地 web 服务来运行这个应用，否则会出现[跨域资源共享](http://en.wikipedia.org/wiki/Cross-origin_resource_sharing) (CORS) 错误。
 
 ## 添加交互
 
@@ -187,13 +188,13 @@ hospitalLayer.on('mouseover', function(e) {
   <DemoIframe gl={false} src="/help/demos/turfjs-intro-js/demo-three.html" />
 }}
 
-接下来，你将通过添加一些分析功能，来让列克星敦的图书馆和医院地图更加有用。
+接下来，你将通过添加一些分析功能，来让列克星敦的图书馆和医院地图更加实用。
 
 ## 使用 Turf
 
 [Turf](http://turfjs.org) 是一个给 web 地图增加空间和统计分析功能的 JavaScript 库。它除了包含了许多常用的 GIS 工具（如缓冲区、叠加和合并），还拥有许多统计分析函数（如加和、求中位数和均值）。
 
-幸运的是，Turf 有一些函数可以在这里帮到你！你可以升级你的地图，从而在用户点击图书馆时向他展示哪个医院离的最近。
+幸运的是，Turf 有一些函数可以在这里帮到你！你可以升级你的地图，从而在用户点击图书馆时向他展示哪个医院离得最近。
 
 作为第一步，在有人点击图书馆标记时创建一个“事件处理程序”。当事件发生时，例如点击了一个标记，事件处理程序将告诉地图如何响应。之前，我们已经创建了一个医院和图书馆标记悬停的事件处理程序，现在需要继续为点击添加一个事件处理程序。
 
@@ -230,7 +231,7 @@ libraryLayer.on('click', function(e) {
 
 <!--copyeditor ignore previously-->
 
-当用户点击图书管事，最近的医院就会变大。但是当用户点击另一个图书馆或地图时，前面这个最近的医院不会恢复成小标记。解决这个问题的同时，我们再加一些代码让最近医院在标记变大时打开弹窗。
+当用户点击图书管时，最近的医院就会变大。但是当用户点击另一个图书馆或地图时，之前这个最近的医院不会恢复成小标记。解决这个问题的同时，我们再加一些代码让最近医院在标记变大时打开弹窗。
 
 在点击事件处理程序之前加入下面的函数。
 
